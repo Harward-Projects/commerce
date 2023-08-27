@@ -8,7 +8,10 @@ from .models import User, Listings, Bids, Comments, Categories
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    Active_Listings = Listings.objects.all()
+    return render(request, "auctions/index.html", {
+        "list": Active_Listings,
+    })
 
 
 def login_view(request):
@@ -61,3 +64,47 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+def create_listing(requst):
+    if requst.method == "POST":
+        title = requst.POST.get("title")
+        description = requst.POST.get("description")
+        bid_price = requst.POST.get("bid_price")
+        photo_url = requst.POST.get("image_URL")
+        category_name = requst.POST.get("category")
+        comment_text = requst.POST.get("comment")
+        print(comment_text)
+        # Check if Category already exists with the same name
+        category, created_category = Categories.objects.get_or_create(name=category_name)
+        if created_category is True:
+            category = Categories(name=category_name)
+            category.save()
+        # category = Categories.objects.create(name=category_name)
+
+        # bid = Bids.objects.create(bid_price=bid_price)
+        bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
+        if created_bid is True:
+            bid = Bids(bid_price=bid_price)
+            bid.save()
+        # Check if Bid already exists with the same amount
+        
+        # comment = Comments.objects.create(content=comment_text)
+        comment = Comments(content=comment_text)
+        comment.save()
+        
+        listing = Listings(title=title, description=description, photo_url=photo_url, comment=comment)
+        listing.save()
+        
+        listing.bid_price.add(bid)
+        listing.category.add(category)
+        
+        return render(requst, "auctions/index.html", {
+            "listing": listing,
+            # "message": "Fields saved correctly.",
+            # "bid": bid.bid_price,
+            # "title":listing.title,
+            # "category":category.name,
+            # "listing category": listing.category,
+        })
+    else:
+        return render(requst, "auctions/create_listing.html")
