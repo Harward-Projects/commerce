@@ -65,40 +65,56 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-def create_listing(requst):
-    if requst.method == "POST":
-        title = requst.POST.get("title")
-        description = requst.POST.get("description")
-        bid_price = requst.POST.get("bid_price")
-        photo_url = requst.POST.get("image_URL")
-        category_name = requst.POST.get("category")
-        comment_text = requst.POST.get("comment")
-        print(comment_text)
-        # Check if Category already exists with the same name
-        category, created_category = Categories.objects.get_or_create(name=category_name)
-        if created_category is True:
-            category = Categories(name=category_name)
-            category.save()
-        # category = Categories.objects.create(name=category_name)
-
-        # bid = Bids.objects.create(bid_price=bid_price)
-        bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
-        if created_bid is True:
-            bid = Bids(bid_price=bid_price)
-            bid.save()
-        # Check if Bid already exists with the same amount
+def create_listing(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        bid_price = request.POST.get("bid_price")
+        photo_url = request.POST.get("image_URL")
+        category_name = request.POST.get("category")
+        comment_text = request.POST.get("comment")
         
-        # comment = Comments.objects.create(content=comment_text)
-        comment = Comments(content=comment_text)
-        comment.save()
+        #Checks if title is blank or repetitive
+        if title:
+            if Listings.objects.filter(title=title).exists():
+                return render(request, "auctions/create_listing.html", {
+                    "message": "Title repetitve, please select another title."
+                })
+        else:
+            return render(request, "auctions/create_listing.html", {
+                "message": "Enter the title ."
+            })
+        
+        # Checks if Bid is blank or repetitive
+        if bid_price:
+            bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
+        else:
+            return render(request, "auctions/create_listing.html", {
+                "message": "Enter bid price."
+            })
+
+        # Checks if Category is blank or repetitive
+        if category_name:
+            category, created_category = Categories.objects.get_or_create(name=category_name)
+        else:
+            category, created_category = Categories.objects.get_or_create(name="Uncategorized")
+        
+        #Checks if comment is blank or repetitive
+        if comment_text:
+            comment, created_comment = Comments.objects.get_or_create(content=comment_text)
+        else:
+            comment, created_comment = Comments.objects.get_or_create(content="No comment")
+            comment.save()
         
         listing = Listings(title=title, description=description, photo_url=photo_url, comment=comment)
         listing.save()
+            
+        print("Listing saved and redirecting...")
+
+        # listing.bid_price.add(bid)
+        # listing.category.add(category)
         
-        listing.bid_price.add(bid)
-        listing.category.add(category)
-        
-        return render(requst, "auctions/index.html", {
+        return render(request, "auctions/index.html", {
             "listing": listing,
             # "message": "Fields saved correctly.",
             # "bid": bid.bid_price,
@@ -107,4 +123,4 @@ def create_listing(requst):
             # "listing category": listing.category,
         })
     else:
-        return render(requst, "auctions/create_listing.html")
+        return render(request, "auctions/create_listing.html")
