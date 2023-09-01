@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from .models import User, Listings, Bids, Comments, Categories
@@ -73,6 +73,7 @@ def create_listing(request):
         photo_url = request.POST.get("image_URL")
         category_name = request.POST.get("category")
         comment_text = request.POST.get("comment")
+        user = request.user.username
         
         #Checks if title is blank or repetitive
         if title:
@@ -104,18 +105,20 @@ def create_listing(request):
             comment, created_comment = Comments.objects.get_or_create(content=comment_text)
         else:
             comment, created_comment = Comments.objects.get_or_create(content="No comment")
-            comment.save()
+            # comment.save()
         
-        listing = Listings(title=title, description=description, photo_url=photo_url, comment=comment)
+        listing = Listings(title=title, description=description, photo_url=photo_url, comment=comment, user=user)
         listing.save()
             
         print("Listing saved and redirecting...")
 
         # listing.bid_price.add(bid)
         # listing.category.add(category)
-        
+
+        Active_Listings = Listings.objects.all()
         return render(request, "auctions/index.html", {
-            "listing": listing,
+            "list": Active_Listings,
+            # "listing": listing,
             # "message": "Fields saved correctly.",
             # "bid": bid.bid_price,
             # "title":listing.title,
@@ -123,4 +126,11 @@ def create_listing(request):
             # "listing category": listing.category,
         })
     else:
+        print("Why else?")
         return render(request, "auctions/create_listing.html")
+
+def listing(request, title):
+    listing = get_object_or_404(Listings, title=title)
+    return render(request, "auctions/listing.html", {
+        "item": listing,
+    })

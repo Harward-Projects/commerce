@@ -16,7 +16,8 @@ class Listings(models.Model):
     bid_price = models.ManyToManyField('Bids', related_name="Bid_price")
     # date = models.DateTimeField()
     comment = models.ForeignKey('Comments', blank=True, on_delete=models.CASCADE)
-    # active_state = models.BooleanField(default=False)
+    active_state = models.BooleanField(default=True, null=True)
+    user = models.CharField(max_length=64, blank=True)
 
 class Bids(models.Model):
     bid_price = models.DecimalField(decimal_places=2, max_digits=6)

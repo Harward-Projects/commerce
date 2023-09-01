@@ -3,10 +3,13 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
-    <ul>
         {% for item in list %}
-            <li>{{ item.title|safe }}</li>
+            {% if item.active_state %}
+                <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
+                <p><img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}"></p>
+                <p class="">{{ item.description|safe }}</p>
+                <p class="">{{ item.price|safe }}</p>
+                <hr>
+            {% endif %}
         {% endfor %}
-    </ul>
 {% endblock %}
