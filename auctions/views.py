@@ -81,6 +81,9 @@ def create_listing(request):
                 return render(request, "auctions/create_listing.html", {
                     "message": "Title repetitve, please select another title."
                 })
+            else:
+                listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
+                listing.save()
         else:
             return render(request, "auctions/create_listing.html", {
                 "message": "Enter the title ."
@@ -89,6 +92,10 @@ def create_listing(request):
         # Checks if Bid is blank or repetitive
         if bid_price:
             bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
+            if created_bid:
+                if Listings.objects.all():
+                    listing.bid_price.set(bid.bid_price)
+                    # Listings.objects.filter(title=title).bid_price.add(bid)
         else:
             return render(request, "auctions/create_listing.html", {
                 "message": "Enter bid price."
@@ -97,18 +104,23 @@ def create_listing(request):
         # Checks if Category is blank or repetitive
         if category_name:
             category, created_category = Categories.objects.get_or_create(name=category_name)
+            print(category)
         else:
             category, created_category = Categories.objects.get_or_create(name="Uncategorized")
-        
+
+        # Now, set the categories using .set() method
+        listing.category.set(category.name)
+
         #Checks if comment is blank or repetitive
         if comment_text:
-            comment, created_comment = Comments.objects.get_or_create(content=comment_text)
+            comment, created_comment = Comments.objects.get_or_create(content=comment_text, user=user)
         else:
-            comment, created_comment = Comments.objects.get_or_create(content="No comment")
-            # comment.save()
+            comment, created_comment = Comments.objects.get_or_create(content="No comment", user=user)
         
-        listing = Listings(title=title, description=description, photo_url=photo_url, comment=comment, user=user)
-        listing.save()
+        listing.comments.set(comment.content)
+
+        # listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
+        # listing.save()
             
         print("Listing saved and redirecting...")
 
@@ -129,8 +141,10 @@ def create_listing(request):
         print("Why else?")
         return render(request, "auctions/create_listing.html")
 
-def listing(request, title):
+def view_listing(request, title):
     listing = get_object_or_404(Listings, title=title)
+    # listing.price = listing.bid_price.
+    
     return render(request, "auctions/listing.html", {
         "item": listing,
     })
