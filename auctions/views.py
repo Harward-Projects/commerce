@@ -83,7 +83,9 @@ def create_listing(request):
                 })
             else:
                 listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
+                print("listing created")
                 listing.save()
+                print("listing saved")
         else:
             return render(request, "auctions/create_listing.html", {
                 "message": "Enter the title ."
@@ -94,7 +96,9 @@ def create_listing(request):
             bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
             if created_bid:
                 if Listings.objects.all():
-                    listing.bid_price.set(bid.bid_price)
+                    print("Listings.objects.all()", Listings.objects.all())
+                    # bidprice = bid.bid_price
+                    listing.bid_price.set([bid])
                     # Listings.objects.filter(title=title).bid_price.add(bid)
         else:
             return render(request, "auctions/create_listing.html", {
@@ -105,11 +109,15 @@ def create_listing(request):
         if category_name:
             category, created_category = Categories.objects.get_or_create(name=category_name)
             print(category)
+            ramak_listing = Listings.objects.get(title="Ramak")
+            parisa_listing = Listings.objects.get(title="Parisa")
+            print("Ramak category: ", ramak_listing.title)
+            print("Parisa category: ", parisa_listing.description)
         else:
             category, created_category = Categories.objects.get_or_create(name="Uncategorized")
 
         # Now, set the categories using .set() method
-        listing.category.set(category.name)
+        listing.category.set([category])
 
         #Checks if comment is blank or repetitive
         if comment_text:
@@ -117,12 +125,13 @@ def create_listing(request):
         else:
             comment, created_comment = Comments.objects.get_or_create(content="No comment", user=user)
         
-        listing.comments.set(comment.content)
+        listing.comments.set([comment])
 
         # listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
         # listing.save()
             
         print("Listing saved and redirecting...")
+        print(listing)
 
         # listing.bid_price.add(bid)
         # listing.category.add(category)
