@@ -8,11 +8,43 @@ from .models import User, Listings, Bids, Comments, Categories
 
 
 def index(request):
-    Active_Listings = Listings.objects.all()
+
+    Active_Listings = Listings.objects.filter(active_state=True)
     return render(request, "auctions/index.html", {
         "list": Active_Listings,
     })
 
+def closed(request):
+
+    Closed_Listings = Listings.objects.filter(active_state=False)
+    return render(request, "auctions/closed_listings.html", {
+        "list": Closed_Listings,
+    })
+
+def categories(request):
+
+    categories = Categories.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categories": categories,
+    })
+
+def view_category(request, category):
+    category_id = get_object_or_404(Categories, name=category).id
+    listings_of_category = Listings.objects.filter(category=category_id)
+    print(listings_of_category)
+    
+    return render(request, "auctions/category.html", {
+        "category": category,
+        "listings_of_category": listings_of_category,
+
+    })
+
+def watchlist(request):
+
+    Closed_Listings = Listings.objects.filter(active_state=False)
+    return render(request, "auctions/closed_listings.html", {
+        "list": Closed_Listings,
+    })
 
 def login_view(request):
     if request.method == "POST":

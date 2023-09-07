@@ -7,7 +7,8 @@
             {% if item.active_state %}
                 <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
                 <p><img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}"></p>
-                <p class="">{{ item.description|safe }}</p>
+                <p class="">Description: {{ item.description|safe }}</p>
+                <p class="">Comments: {{ item.comments|safe }}</p>
                 <p class="">{{ item.price|safe }}</p>
                 <hr>
             {% endif %}
