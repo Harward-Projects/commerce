@@ -12,16 +12,17 @@
         <p class="">{{ comment|safe }}</p>
     {% endfor %}
 
-    {% if user in item.watchlist.all %}
-    {{ item.watchlist.user_id }}
-        {% if message %}
-            <p class="alert alert-danger">{{ message }}</p>
-        <a class="btn btn-danger" href="{% url 'ARWatchlist' key=0 title=item.title %}">Yes, Remove it from my Watchlist</a>
+    {% if user.is_authenticated %}
+        {% if user in item.watchlist.all %}
+            {% if message %}
+                <p class="alert alert-danger">{{ message }}</p>
+            <a class="btn btn-danger" href="{% url 'ARWatchlist' key=0 title=item.title %}">Yes, Remove it from my Watchlist</a>
+            {% else %}
+            <a class="btn btn-secondary" href="{% url 'ARWatchlist' key=2 title=item.title %}">Remove from my Watchlist</a>
+            {% endif %}
         {% else %}
-        <a class="btn btn-secondary" href="{% url 'ARWatchlist' key=2 title=item.title %}">Remove from my Watchlist</a>
+            <a class="btn btn-primary" href="{% url 'ARWatchlist' key=1 title=item.title %}">Add to my Watchlist</a>
         {% endif %}
-    {% else %}
-        <a class="btn btn-primary" href="{% url 'ARWatchlist' key=1 title=item.title %}">Add to my Watchlist</a>
     {% endif %}
 
 {% endblock %}
