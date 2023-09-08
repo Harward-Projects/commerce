@@ -8,7 +8,7 @@
                 <p>Listing: <a href="{% url 'listing' title=listing_of_category.title %}">{{ listing_of_category.title|safe }}</a></p>
                 <p><img src="{{ listing_of_category.photo_url|safe }}" alt="{{ listing_of_category.title|safe }}"></p>
                 <p class="">Description: {{ listing_of_category.description|safe }}</p>
-                <p class="">Comments: {{ listing_of_category.comments|safe }}</p>
+                <!-- <p class="">Comments: {{ listing_of_category.comments|safe }}</p> -->
                 <p class="">Price: {{ listing_of_category.price|safe }}</p>
                 <hr>
             {% endif %}

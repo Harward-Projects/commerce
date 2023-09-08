@@ -82,6 +82,32 @@ def ARWatchlist(request, key, title):
             "listing": listing,
         })
 
+def add_comment(request, title):
+    listing = Listings.objects.get(title=title)
+
+    if request.method == 'POST':
+        user = request.user.username
+        new_comment = request.POST.get("new_comment")
+        added_comment, created_added_comment = Comments.objects.get_or_create(content=new_comment, user=user)
+
+        if new_comment and created_added_comment:
+            listing.comments.add(added_comment.id)
+            print("comment added to {listing} listing")
+            return render(request, "auctions/listing.html", {
+                    "item": listing,
+                })
+        else:
+            return render(request, "auctions/listing.html", {
+                "message": "Can't add empty or repetitive comment!",
+                "item": listing,
+            })
+
+    else:
+        print("Why else?")
+        print(f"title in add_comment: {listing.title}")
+        return render(request, "auctions/listing.html", {
+            "item": listing,
+        })
 def login_view(request):
     if request.method == "POST":
 
@@ -166,7 +192,7 @@ def create_listing(request):
                 if Listings.objects.all():
                     print("Listings.objects.all()", Listings.objects.all())
                     # bidprice = bid.bid_price
-                    listing.bid_price.set([bid])
+                    listing.bid_price.add(bid.id)
                     # Listings.objects.filter(title=title).bid_price.add(bid)
         else:
             return render(request, "auctions/create_listing.html", {
@@ -193,7 +219,7 @@ def create_listing(request):
         else:
             comment, created_comment = Comments.objects.get_or_create(content="No comment", user=user)
         
-        listing.comments.set([comment])
+        listing.comments.add(comment.id)
 
         # listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
         # listing.save()
@@ -221,14 +247,15 @@ def create_listing(request):
 def view_listing(request, title):
     listing = get_object_or_404(Listings, title=title)
     # listing.price = listing.bid_price.
-    user = request.user.username
+    # user = request.user.username
     # user_id = User.objects.get(username=user).id
     # listing_id = Listings.objects.get(title=title).id
     
     # print(listing.watchlist.filter(Q(listings_id=listing_id) & Q(user_id=user_id)))
     # print(f"state: {listing.watchlist.filter(id=user_id).exists()} and user: {user}")
-    print(f"state: {listing.watchlist.filter(username=user).exists()} and user: {user}")
+    # print(f"state: {listing.watchlist.filter(username=user).exists()} and user: {user}")
+    print(f"title in view_listing: {listing.title}")
 
     return render(request, "auctions/listing.html", {
         "item": listing,
-    })
+        })
