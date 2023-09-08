@@ -4,10 +4,24 @@
 
     <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
     <p><img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}"></p>
-    <p class="">{{ item.description|safe }}</p>
+    <p class="">Description: {{ item.description|safe }}</p>
     <p class="">{{ item.price|safe }}</p>
+    
+    <p>Comments: </p>
     {% for comment in item.comments.all %}
         <p class="">{{ comment|safe }}</p>
     {% endfor %}
+
+    {% if user in item.watchlist.all %}
+    {{ item.watchlist.user_id }}
+        {% if message %}
+            <p class="alert alert-danger">{{ message }}</p>
+        <a class="btn btn-danger" href="{% url 'ARWatchlist' key=0 title=item.title %}">Yes, Remove it from my Watchlist</a>
+        {% else %}
+        <a class="btn btn-secondary" href="{% url 'ARWatchlist' key=2 title=item.title %}">Remove from my Watchlist</a>
+        {% endif %}
+    {% else %}
+        <a class="btn btn-primary" href="{% url 'ARWatchlist' key=1 title=item.title %}">Add to my Watchlist</a>
+    {% endif %}
 
 {% endblock %}

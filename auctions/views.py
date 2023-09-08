@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -40,11 +41,46 @@ def view_category(request, category):
     })
 
 def watchlist(request):
-
-    Closed_Listings = Listings.objects.filter(active_state=False)
-    return render(request, "auctions/closed_listings.html", {
-        "list": Closed_Listings,
+    user = request.user.username
+    user_id = User.objects.get(username=user).id
+    watchlist = Listings.objects.filter(watchlist=user_id)
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist,
     })
+
+def ARWatchlist(request, key, title):
+    user = request.user.username
+    user_id = User.objects.get(username=user).id
+    listing = Listings.objects.get(title=title)
+    watchlist = Listings.objects.filter(watchlist=user_id)
+
+
+    # alarm message to confirm removal
+    if key == 2:
+        return render(request, 'auctions/listing.html', {
+            "message": "You are going to remove this listing from your watchlish, are you sure?",
+            "watchlist": watchlist,
+            # listing in the below line represents used item in other htmls, this time listing is used to distinguish with below item in for loop!
+            "item": listing,
+        })
+    
+    # No message, first attempt to remove
+    if key == 0:
+        listing.watchlist.remove(user_id)
+        return render(request, 'auctions/watchlist.html', {
+            "message": " removed from your watchlist!",
+            "watchlist": watchlist,
+            "listing": listing,
+        })
+    
+    # Adding to watchlist
+    if key == 1:
+        listing.watchlist.set([user_id])
+        return render(request, 'auctions/watchlist.html', {
+            "message": " has been added to your watchlist.",
+            "watchlist": watchlist,
+            "listing": listing,
+        })
 
 def login_view(request):
     if request.method == "POST":
@@ -185,7 +221,14 @@ def create_listing(request):
 def view_listing(request, title):
     listing = get_object_or_404(Listings, title=title)
     # listing.price = listing.bid_price.
+    user = request.user.username
+    # user_id = User.objects.get(username=user).id
+    # listing_id = Listings.objects.get(title=title).id
     
+    # print(listing.watchlist.filter(Q(listings_id=listing_id) & Q(user_id=user_id)))
+    # print(f"state: {listing.watchlist.filter(id=user_id).exists()} and user: {user}")
+    print(f"state: {listing.watchlist.filter(username=user).exists()} and user: {user}")
+
     return render(request, "auctions/listing.html", {
         "item": listing,
     })

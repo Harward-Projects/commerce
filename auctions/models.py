@@ -39,4 +39,5 @@ class Listings(models.Model):
     comments = models.ManyToManyField(Comments, blank=True, related_name="listings")
     active_state = models.BooleanField(default=True, null=True)
     user = models.CharField(max_length=64, blank=True)
+    watchlist = models.ManyToManyField(User, blank=True, related_name='added_listings')
 
