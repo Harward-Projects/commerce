@@ -9,21 +9,18 @@ from .models import User, Listings, Bids, Comments, Categories
 
 
 def index(request):
-
     Active_Listings = Listings.objects.filter(active_state=True)
     return render(request, "auctions/index.html", {
         "list": Active_Listings,
     })
 
 def closed(request):
-
     Closed_Listings = Listings.objects.filter(active_state=False)
     return render(request, "auctions/closed_listings.html", {
         "list": Closed_Listings,
     })
 
 def categories(request):
-
     categories = Categories.objects.all()
     return render(request, "auctions/categories.html", {
         "categories": categories,
@@ -165,7 +162,7 @@ def create_listing(request):
         description = request.POST.get("description")
         bid_price = request.POST.get("bid_price")
         photo_url = request.POST.get("image_URL")
-        category_name = request.POST.get("category")
+        category_input = request.POST.get("category")
         comment_text = request.POST.get("comment")
         user = request.user.username
         
@@ -200,18 +197,15 @@ def create_listing(request):
             })
 
         # Checks if Category is blank or repetitive
-        if category_name:
-            category, created_category = Categories.objects.get_or_create(name=category_name)
-            print(category)
-            ramak_listing = Listings.objects.get(title="Ramak")
-            parisa_listing = Listings.objects.get(title="Parisa")
-            print("Ramak category: ", ramak_listing.title)
-            print("Parisa category: ", parisa_listing.description)
-        else:
-            category, created_category = Categories.objects.get_or_create(name="Uncategorized")
+        categories = [category.strip() for category in category_input.split(',')]
+        for category_name in categories:
+            if category_name:
+                category, created_category = Categories.objects.get_or_create(name=category_name)
+                listing.category.add(category.id)
+            else:
+                category, created_category = Categories.objects.get_or_create(name="Uncategorized")
 
         # Now, set the categories using .set() method
-        listing.category.set([category])
 
         #Checks if comment is blank or repetitive
         if comment_text:
