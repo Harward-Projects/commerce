@@ -6,7 +6,9 @@
         {% for item in list %}
             {% if item.active_state %}
                 <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
-                <p><img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}"></p>
+                <div class="col-md-4">
+                    <img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}" class="img-fluid img-thumbnail">
+                </div>
                 <p class="">Description: {{ item.description|safe }}</p>
                 <!-- <p class="">Comments: {{ item.comments|safe }}</p> -->
                 <p class="">Price: {{ item.price|safe }}</p>

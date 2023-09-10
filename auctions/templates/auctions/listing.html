@@ -3,8 +3,10 @@
 {% block body %}
 
     <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
-    <p><img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}"></p>
-    <p class="">Description: {{ item.description|safe }}</p>
+    <div class="col-md-12 text-center">
+        <img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}" class="img-fluid img-thumbnail">
+        <p class="">Description: {{ item.description|safe }}</p>
+    </div>
     <p class="">{{ item.price|safe }}</p>
     <h2 class="">Details:</h2>
     <li>Listed by: 
@@ -21,10 +23,10 @@
         {% endif %}
     </li>
     
-    <p>Comments:</p>
+    <li>Comments:</li>
     {% for comment in item.comments.all %}
         {% if comment != "No comment" %}
-            <p class="">{{ comment|safe }}</p>
+            <p class="comment">{{ comment|safe }}</p>
             <hr>
         {% endif %}
     {% endfor %}

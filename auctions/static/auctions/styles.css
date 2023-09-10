@@ -6,3 +6,7 @@ body {
 .category-indentation {
     margin-left: 5px;
 }
+
+p.comment {
+    margin-left: 25px;
+}
