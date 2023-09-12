@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from decimal import Decimal
 
 from .models import User, Listings, Bids, Comments, Categories
 
@@ -79,26 +80,50 @@ def ARWatchlist(request, key, title):
             "listing": listing,
         })
 
-def add_comment(request, title):
+def add_comment_or_bid(request, title):
     listing = Listings.objects.get(title=title)
+    user = request.user.username
 
     if request.method == 'POST':
-        user = request.user.username
-        new_comment = request.POST.get("new_comment")
-        added_comment, created_added_comment = Comments.objects.get_or_create(content=new_comment, user=user)
-
-        if new_comment and created_added_comment:
-            listing.comments.add(added_comment.id)
-            print("comment added to {listing} listing")
-            return render(request, "auctions/listing.html", {
+        if 'comment_submit' in request.POST:
+            new_comment = request.POST.get("new_comment")
+            if new_comment:
+                added_comment, created_added_comment = Comments.objects.get_or_create(content=new_comment)
+                if created_added_comment:
+                    listing.comments.add(added_comment.id)
+                    print("comment added to {listing} listing")
+                    return render(request, "auctions/listing.html", {
+                            "item": listing,
+                        })
+            else:
+                return render(request, "auctions/listing.html", {
+                    "message": "Can't add empty or repetitive comment!",
                     "item": listing,
                 })
-        else:
-            return render(request, "auctions/listing.html", {
-                "message": "Can't add empty or repetitive comment!",
-                "item": listing,
-            })
-
+        elif 'bid_submit' in request.POST:
+            try:
+                new_bid = Decimal(request.POST.get("bid"))
+            except ValueError:
+                print(f"Invalid decimal: {new_bid}")
+            if new_bid:
+                if new_bid > Decimal(listing.price):
+                    listing.price = new_bid
+                    listing.save()
+                    listing.bids_number += 1
+                    listing.save()
+                    return render(request, "auctions/listing.html", {
+                        "item": listing,
+                    })
+                else:
+                    return render(request, "auctions/listing.html", {
+                        "message": "You should bid a price greater than others'",
+                        "item": listing,
+                    })
+            else:
+                return render(request, "auctions/listing.html", {
+                        "message": "You should bid a price greater than others'",
+                        "item": listing,
+                    })
     else:
         print("Why else?")
         print(f"title in add_comment: {listing.title}")
@@ -182,15 +207,12 @@ def create_listing(request):
                 "message": "Enter the title ."
             })
         
-        # Checks if Bid is blank or repetitive
+        # sets price for listing
         if bid_price:
             bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
-            if created_bid:
-                if Listings.objects.all():
-                    print("Listings.objects.all()", Listings.objects.all())
-                    # bidprice = bid.bid_price
-                    listing.bid_price.add(bid.id)
-                    # Listings.objects.filter(title=title).bid_price.add(bid)
+            listing.price = bid.bid_price
+            listing.save()
+
         else:
             return render(request, "auctions/create_listing.html", {
                 "message": "Enter bid price."
@@ -209,9 +231,9 @@ def create_listing(request):
 
         #Checks if comment is blank or repetitive
         if comment_text:
-            comment, created_comment = Comments.objects.get_or_create(content=comment_text, user=user)
+            comment, created_comment = Comments.objects.get_or_create(content=comment_text)
         else:
-            comment, created_comment = Comments.objects.get_or_create(content="No comment", user=user)
+            comment, created_comment = Comments.objects.get_or_create(content="No comment")
         
         listing.comments.add(comment.id)
 

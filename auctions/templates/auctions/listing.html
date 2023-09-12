@@ -12,6 +12,8 @@
     <li>Listed by: 
         {% if item.user == "admin" %}
             <a href="{% url 'admin:index' %}">{{ item.user }}</a></li>
+        {% else %}
+            {{ item.user }}
         {% endif %}
     <li class="">Categories: 
         {% if item.category %}
@@ -32,7 +34,19 @@
     {% endfor %}
 
     {% if user.is_authenticated %}
-        <form action="{% url 'add_comment' title=item.title %}" method="post">
+        {% if message %}
+            {{ message }}
+        {% endif %}
+        {% if item.bids_number %}
+            <h6>{{ item.bids_number }} bid(s) so far. </h6>
+        {% endif %}
+        <form action="{% url 'add_comment_or_bid' title=item.title %}" method="post">
+            {% csrf_token %}
+            <input class="col-md-2" type="number" name="bid" placeholder="Place your bid here, greater than others'">
+            <input class="btn btn-primary" type="submit" name="bid_submit" value="Place Bid">
+        </form>
+        <hr>
+        <form action="{% url 'add_comment_or_bid' title=item.title %}" method="post">
             {% csrf_token %}
             <!-- <div class="form-group"> -->
                 <input class="form-control" type="text" name="new_comment" placeholder="New Comment">
@@ -42,7 +56,7 @@
                 <P class="alert alert-warning">{{ message }}</P>
                 <br>
             {% endif %}
-            <input class="btn btn-primary" type="submit" value="Add Comment">
+            <input class="btn btn-primary" type="submit" name="comment_submit" value="Add Comment">
         </form>
         <br>
         {% if user in item.watchlist.all %}
