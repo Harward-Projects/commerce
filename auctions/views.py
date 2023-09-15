@@ -30,8 +30,6 @@ def categories(request):
 def view_category(request, category):
     category_id = get_object_or_404(Categories, name=category).id
     listings_of_category = Listings.objects.filter(category=category_id)
-    print(listings_of_category)
-    
     return render(request, "auctions/category.html", {
         "category": category,
         "listings_of_category": listings_of_category,
@@ -95,35 +93,39 @@ def add_comment_or_bid(request, title):
                     return render(request, "auctions/listing.html", {
                             "item": listing,
                         })
+                else:
+                    return render(request, "auctions/listing.html", {
+                        "message": "Can't add repetitive comment!",
+                        "item": listing,
+                    })    
             else:
                 return render(request, "auctions/listing.html", {
-                    "message": "Can't add empty or repetitive comment!",
+                    "message": "Can't add empty comment!",
                     "item": listing,
                 })
         elif 'bid_submit' in request.POST:
-            try:
-                new_bid = Decimal(request.POST.get("bid"))
-            except ValueError:
-                print(f"Invalid decimal: {new_bid}")
-                # if it needs exit here or not?
-            if new_bid:
-                if not listing.price:
-                    listing.price = 0
-                if new_bid > Decimal(listing.price):
-                    listing.price = new_bid
-                    listing.save()
-                    new_bid_record = Bids.objects.create(bid_price=new_bid, user=user)
-                    listing.bid_price.add(new_bid_record.id)
-                    listing.bids_number += 1
-                    listing.save()
-                    return render(request, "auctions/listing.html", {
-                        "item": listing,
-                    })
-                else:
-                    return render(request, "auctions/listing.html", {
-                        "message": "You should bid a price greater than others'",
-                        "item": listing,
-                    })
+            if request.POST.get("bid"):
+                try:
+                    new_bid = Decimal(request.POST.get("bid"))
+                except ValueError:
+                    return HttpResponse("Invalid decimal: {new_bid}")
+            else:
+                return render(request, "auctions/listing.html", {
+                    "message": "Can't put empty bid!",
+                    "item": listing,
+                })
+            if not listing.price:
+                listing.price = 0
+            if new_bid > Decimal(listing.price):
+                listing.price = new_bid
+                listing.save()
+                new_bid_record = Bids.objects.create(bid_price=new_bid, user=user)
+                listing.bid_price.add(new_bid_record.id)
+                listing.bids_number += 1
+                listing.save()
+                return render(request, "auctions/listing.html", {
+                    "item": listing,
+                })
             else:
                 return render(request, "auctions/listing.html", {
                         "message": "You should bid a valid price greater than others'",
@@ -137,8 +139,6 @@ def add_comment_or_bid(request, title):
                 "item": listing,
             })
     else:
-        print("Why else?")
-        print(f"title in add_comment: {listing.title}")
         return render(request, "auctions/listing.html", {
             "item": listing,
         })
@@ -240,53 +240,23 @@ def create_listing(request):
         else:
             category, created_category = Categories.objects.get_or_create(name="Uncategorized")
             listing.category.add(category.id)
-        print(category)
-
-        # Now, set the categories using .set() method
 
         #Checks if comment is blank or repetitive
         if comment_text:
             comment, created_comment = Comments.objects.get_or_create(content=comment_text)
         else:
             comment, created_comment = Comments.objects.get_or_create(content="No comment")
-        
         listing.comments.add(comment.id)
-
-        # listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
-        # listing.save()
-            
-        print("Listing saved and redirecting...")
-        print(listing)
-
-        # listing.bid_price.add(bid)
-        # listing.category.add(category)
-
         Active_Listings = Listings.objects.all()
+
         return render(request, "auctions/index.html", {
             "list": Active_Listings,
-            # "listing": listing,
-            # "message": "Fields saved correctly.",
-            # "bid": bid.bid_price,
-            # "title":listing.title,
-            # "category":category.name,
-            # "listing category": listing.category,
         })
     else:
-        print("Why else?")
         return render(request, "auctions/create_listing.html")
 
 def view_listing(request, title):
     listing = get_object_or_404(Listings, title=title)
-    # listing.price = listing.bid_price.
-    # user = request.user.username
-    # user_id = User.objects.get(username=user).id
-    # listing_id = Listings.objects.get(title=title).id
-    
-    # print(listing.watchlist.filter(Q(listings_id=listing_id) & Q(user_id=user_id)))
-    # print(f"state: {listing.watchlist.filter(id=user_id).exists()} and user: {user}")
-    # print(f"state: {listing.watchlist.filter(username=user).exists()} and user: {user}")
-    print(f"title in view_listing: {listing.title}")
-
     return render(request, "auctions/listing.html", {
         "item": listing,
         })
