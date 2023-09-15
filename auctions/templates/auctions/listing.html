@@ -16,15 +16,9 @@
             {{ item.user }}
         {% endif %}
     <li class="">Categories: 
-        {% if item.category %}
-            {% for category in item.category.all %}
-                {% if category != "Uncategorized" %}
-                    <a class="category-indentation" href="{% url 'category' category=category %}">{{ category|safe }}</a>
-                {% else %}
-                    <a class="category-indentation" href="{% url 'category' category=category %}">{{ category|safe }}</a>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+        {% for category in item.category.all %}
+            <a class="category-indentation" href="{% url 'category' category=category %}">{{ category|safe }}</a>
+        {% endfor %}
     </li>
     
     <li>Comments:</li>
@@ -36,23 +30,34 @@
     {% endfor %}
 
     {% if user.is_authenticated %}
-        {% if message %}
-            {{ message }}
+        {% if item.active_state %}
+            {% if message %}
+                {{ message }}
+            {% endif %}
+            {% if item.bids_number %}
+                <h6>{{ item.bids_number }} bid(s) so far.
+                    {% for bid in item.bid_price.all %}
+                        {% if bid.bid_price == item.price %}
+                            Your bid is the current bid.
+                        {% endif %}
+                    {% endfor %}
+                </h6>
+            {% endif %}
+            <form acti  on="{% url 'add_comment_or_bid' title=item.title %}" method="post">
+                {% csrf_token %}
+                <input class="col-md-2" type="number" name="bid" placeholder="Place your bid here, greater than others'">
+                <input class="btn btn-primary" type="submit" name="bid_submit" value="Place Bid">
+                {% if item.user == user.username %}
+                    <input class="btn btn-secondary" type="submit" name="bid_close" value="Close the Bid">
+                {% endif %}
+            </form>
+        {% else %}
+            {% if item.user == user.username %}
+                <p class="alert alert-success">You are the winner of this listing, with the price of {{ item.price }}</p>
+            {% else %}
+                <P class="alert alert-warning">This listing is Closed!</P>
+            {% endif %}
         {% endif %}
-        {% if item.bids_number %}
-            <h6>{{ item.bids_number }} bid(s) so far.
-                {% for bid in item.bid_price.all %}
-                    {% if bid.bid_price == item.price %}
-                        Your bid is the current bid.
-                    {% endif %}
-                {% endfor %}
-            </h6>
-        {% endif %}
-        <form action="{% url 'add_comment_or_bid' title=item.title %}" method="post">
-            {% csrf_token %}
-            <input class="col-md-2" type="number" name="bid" placeholder="Place your bid here, greater than others'">
-            <input class="btn btn-primary" type="submit" name="bid_submit" value="Place Bid">
-        </form>
         <hr>
         <form action="{% url 'add_comment_or_bid' title=item.title %}" method="post">
             {% csrf_token %}

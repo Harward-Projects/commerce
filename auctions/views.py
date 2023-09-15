@@ -127,6 +127,13 @@ def add_comment_or_bid(request, title):
                         "message": "You should bid a valid price greater than others'",
                         "item": listing,
                     })
+        elif 'bid_close' in request.POST:
+            listing.active_state = False
+            listing.save()
+            return render(request, "auctions/listing.html", {
+                "message": "You should bid a valid price greater than others'",
+                "item": listing,
+            })
     else:
         print("Why else?")
         print(f"title in add_comment: {listing.title}")
