@@ -107,6 +107,8 @@ def add_comment_or_bid(request, title):
                 print(f"Invalid decimal: {new_bid}")
                 # if it needs exit here or not?
             if new_bid:
+                if not listing.price:
+                    listing.price = 0
                 if new_bid > Decimal(listing.price):
                     listing.price = new_bid
                     listing.save()
