@@ -3,6 +3,7 @@ from django.db import models
 
 class Bids(models.Model):
     bid_price = models.DecimalField(decimal_places=2, max_digits=6)
+    user = models.CharField(max_length=64, default='admin')
 
     def __str__(self):
         return str(self.bid_price)
@@ -15,7 +16,7 @@ class Comments(models.Model):
 
 
 class Categories(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, default="Uncategorized")
 
     def __str__(self):
         return self.name

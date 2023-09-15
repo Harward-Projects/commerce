@@ -105,10 +105,13 @@ def add_comment_or_bid(request, title):
                 new_bid = Decimal(request.POST.get("bid"))
             except ValueError:
                 print(f"Invalid decimal: {new_bid}")
+                # if it needs exit here or not?
             if new_bid:
                 if new_bid > Decimal(listing.price):
                     listing.price = new_bid
                     listing.save()
+                    new_bid_record = Bids.objects.create(bid_price=new_bid, user=user)
+                    listing.bid_price.add(new_bid_record.id)
                     listing.bids_number += 1
                     listing.save()
                     return render(request, "auctions/listing.html", {
@@ -121,7 +124,7 @@ def add_comment_or_bid(request, title):
                     })
             else:
                 return render(request, "auctions/listing.html", {
-                        "message": "You should bid a price greater than others'",
+                        "message": "You should bid a valid price greater than others'",
                         "item": listing,
                     })
     else:
@@ -209,7 +212,7 @@ def create_listing(request):
         
         # sets price for listing
         if bid_price:
-            bid, created_bid = Bids.objects.get_or_create(bid_price=bid_price)
+            bid = Bids.objects.create(bid_price=bid_price, user=user)
             listing.price = bid.bid_price
             listing.save()
 
@@ -219,13 +222,16 @@ def create_listing(request):
             })
 
         # Checks if Category is blank or repetitive
-        categories = [category.strip() for category in category_input.split(',')]
-        for category_name in categories:
-            if category_name:
+        if category_input:
+            categories = [category.strip() for category in category_input.split(',')]
+            print(f"Category must not be Uncategorized. But is: {categories}")
+            for category_name in categories:
                 category, created_category = Categories.objects.get_or_create(name=category_name)
                 listing.category.add(category.id)
-            else:
-                category, created_category = Categories.objects.get_or_create(name="Uncategorized")
+        else:
+            category, created_category = Categories.objects.get_or_create(name="Uncategorized")
+            listing.category.add(category.id)
+        print(category)
 
         # Now, set the categories using .set() method
 

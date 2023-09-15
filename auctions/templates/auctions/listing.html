@@ -20,6 +20,8 @@
             {% for category in item.category.all %}
                 {% if category != "Uncategorized" %}
                     <a class="category-indentation" href="{% url 'category' category=category %}">{{ category|safe }}</a>
+                {% else %}
+                    <a class="category-indentation" href="{% url 'category' category=category %}">{{ category|safe }}</a>
                 {% endif %}
             {% endfor %}
         {% endif %}
@@ -38,7 +40,13 @@
             {{ message }}
         {% endif %}
         {% if item.bids_number %}
-            <h6>{{ item.bids_number }} bid(s) so far. </h6>
+            <h6>{{ item.bids_number }} bid(s) so far.
+                {% for bid in item.bid_price.all %}
+                    {% if bid.bid_price == item.price %}
+                        Your bid is the current bid.
+                    {% endif %}
+                {% endfor %}
+            </h6>
         {% endif %}
         <form action="{% url 'add_comment_or_bid' title=item.title %}" method="post">
             {% csrf_token %}

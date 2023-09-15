@@ -24,4 +24,4 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(Bids)
 class BidAdmin(admin.ModelAdmin):
-    list_display = ['bid_price']
+    list_display = ['bid_price', 'user']
