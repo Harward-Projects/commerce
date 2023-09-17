@@ -89,7 +89,7 @@ def add_comment_or_bid(request, title):
                 added_comment, created_added_comment = Comments.objects.get_or_create(content=new_comment)
                 if created_added_comment:
                     listing.comments.add(added_comment.id)
-                    print("comment added to {listing} listing")
+                    print(f"comment added to {listing.title} listing")
                     return render(request, "auctions/listing.html", {
                             "item": listing,
                         })
