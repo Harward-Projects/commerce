@@ -9,10 +9,17 @@
     <h2>Watchlist Listings</h2>
 
         {% for item in watchlist %}
-            <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
-            <p><img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}"></p>
-            <p class="">Description: {{ item.description|safe }}</p>
-            <p class="">Price: {{ item.price|safe }}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}" class="img-fluid img-thumbnail" style="width: 30rem;">
+                </div>
+                <div class="col-md-6 align-self-center">
+                    <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
+                    <p class="">Description: {{ item.description|safe }}</p>
+                    <p class="">Price: {{ item.price|safe }}</p>
+                    <p class="">Created {{ item.creation_date|date:"D, d m y" }} {{ item.creation_date|time:"h:i A" }}</p>
+                </div>
+            </div>
             <hr>
         {% endfor %}
 {% endblock %}

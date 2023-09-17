@@ -5,11 +5,17 @@
     <ul>
         {% for listing_of_category in listings_of_category %}
             {% if listing_of_category.active_state %}
-                <p>Listing: <a href="{% url 'listing' title=listing_of_category.title %}">{{ listing_of_category.title|safe }}</a></p>
-                <p><img src="{{ listing_of_category.photo_url|safe }}" alt="{{ listing_of_category.title|safe }}"></p>
-                <p class="">Description: {{ listing_of_category.description|safe }}</p>
-                <!-- <p class="">Comments: {{ listing_of_category.comments|safe }}</p> -->
-                <p class="">Price: {{ listing_of_category.price|safe }}</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="{{ listing_of_category.photo_url|safe }}" alt="{{ listing_of_category.title|safe }}" class="img-fluid img-thumbnail" style="width: 30rem;">
+                    </div>
+                    <div class="col-md-6 align-self-center">
+                        <p>Listing: <a href="{% url 'listing' title=listing_of_category.title %}">{{ listing_of_category.title|safe }}</a></p>
+                        <p class="">Description: {{ listing_of_category.description|safe }}</p>
+                        <p class="">Price: {{ listing_of_category.price|safe }}</p>
+                        <p class="">Created {{ listing_of_category.creation_date|date:"D, d m y" }} {{ listing_of_category.creation_date|time:"h:i A" }}</p>
+                    </div>
+                </div>
                 <hr>
             {% endif %}
         {% endfor %}

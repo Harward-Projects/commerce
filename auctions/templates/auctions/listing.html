@@ -4,10 +4,10 @@
 
     <p>Listing: <a href="{% url 'listing' title=item.title %}">{{ item.title|safe }}</a></p>
     <div class="col-md-12 text-center">
-        <img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}" class="img-fluid img-thumbnail">
+        <img src="{{ item.photo_url|safe }}" alt="{{ item.title|safe }}" class="img-fluid img-thumbnail" style="width: 40rem;">
         <p class="">Description: {{ item.description|safe }}</p>
     </div>
-    <p class="">{{ item.price|safe }}</p>
+    <p class="">Price: {{ item.price|safe }}</p>
     <h2 class="">Details:</h2>
     <li>Listed by: 
         {% if item.user == "admin" %}
@@ -43,11 +43,11 @@
                     {% endfor %}
                 </h6>
             {% endif %}
-            <form acti  on="{% url 'add_comment_or_bid' title=item.title %}" method="post">
+            <form action="{% url 'add_comment_or_bid' title=item.title %}" method="post">
                 {% csrf_token %}
                 <input class="col-md-2" type="number" name="bid" placeholder="Place your bid here, greater than others'">
                 <input class="btn btn-primary" type="submit" name="bid_submit" value="Place Bid">
-                {% if item.user == user.username %}
+                {% if item.user == user.username and item.price %}
                     <input class="btn btn-secondary" type="submit" name="bid_close" value="Close the Bid">
                 {% endif %}
             </form>

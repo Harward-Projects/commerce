@@ -2,9 +2,9 @@
 
 {% block body %}
     <h2>Categories</h2>
-    <ul>
+    <ul class="list-group row">
         {% for category in categories %}
-            <li><a href="{% url 'category' category=category %}">{{ category }}</a></li>
+            <li class="list-group-item list-group-item-dark col-md-2 text-center"><a href="{% url 'category' category=category %}">{{ category }}</a></li>
         {% endfor %}
     </ul>
 {% endblock %}

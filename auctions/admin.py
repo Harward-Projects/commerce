@@ -5,7 +5,7 @@ from .models import Listings, Categories, Comments, Bids
 # Register your models here.
 @admin.register(Listings)
 class ListingAdmin(admin.ModelAdmin):
-    list_display = ['title', 'description', 'get_comment_list']
+    list_display = ['title', 'description', 'get_comment_list', 'user', 'creation_date']
 
     def get_comment_list(self, listing):
         comments = listing.comments.all()

@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from decimal import Decimal
+from datetime import datetime
 
 from .models import User, Listings, Bids, Comments, Categories
 
@@ -202,6 +203,7 @@ def create_listing(request):
         category_input = request.POST.get("category")
         comment_text = request.POST.get("comment")
         user = request.user.username
+        creation_date = datetime.now()
         
         #Checks if title is blank or repetitive
         if title:
@@ -210,7 +212,7 @@ def create_listing(request):
                     "message": "Title repetitve, please select another title."
                 })
             else:
-                listing = Listings(title=title, description=description, photo_url=photo_url, user=user)
+                listing = Listings(title=title, description=description, photo_url=photo_url, user=user, creation_date=creation_date)
                 print("listing created")
                 listing.save()
                 print("listing saved")

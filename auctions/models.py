@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from datetime import datetime
 
 class Bids(models.Model):
     bid_price = models.DecimalField(decimal_places=2, max_digits=6)
@@ -35,7 +36,7 @@ class Listings(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=6, null=True)
     bids_number = models.IntegerField(default=0)
     bid_price = models.ManyToManyField(Bids, related_name="Bid_price")
-    # date = models.DateTimeField()
+    creation_date = models.DateTimeField(default=datetime.now())
     comments = models.ManyToManyField(Comments, blank=True, null=True, related_name="listings")
     active_state = models.BooleanField(default=True, null=True)
     user = models.CharField(max_length=64, blank=True)
