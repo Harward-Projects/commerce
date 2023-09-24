@@ -206,7 +206,7 @@ def create_listing(request):
         creation_date = datetime.now()
         
         #Checks if title is blank or repetitive
-        if title:
+        if title and bid_price and description:
             if Listings.objects.filter(title=title).exists():
                 return render(request, "auctions/create_listing.html", {
                     "message": "Title repetitve, please select another title."
@@ -214,24 +214,15 @@ def create_listing(request):
             else:
                 listing = Listings(title=title, description=description, photo_url=photo_url, user=user, creation_date=creation_date)
                 print("listing created")
+                bid = Bids.objects.create(bid_price=bid_price, user=user)
+                listing.price = bid.bid_price
                 listing.save()
                 print("listing saved")
         else:
             return render(request, "auctions/create_listing.html", {
-                "message": "Enter the title ."
+                "message": "Title, description and starting bid price are mandatory."
             })
         
-        # sets price for listing
-        if bid_price:
-            bid = Bids.objects.create(bid_price=bid_price, user=user)
-            listing.price = bid.bid_price
-            listing.save()
-
-        else:
-            return render(request, "auctions/create_listing.html", {
-                "message": "Enter bid price."
-            })
-
         # Checks if Category is blank or repetitive
         if category_input:
             categories = [category.strip() for category in category_input.split(',')]
