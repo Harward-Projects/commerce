@@ -32,7 +32,6 @@ class Listings(models.Model):
     description = models.CharField(max_length=100)
     photo_url = models.URLField(max_length=300, blank=True)
     category = models.ManyToManyField(Categories, blank=True, related_name="Category")
-    # There must be an optional base_price and bid_price. The final price should be max of these base and bid prices.
     price = models.DecimalField(decimal_places=2, max_digits=6, null=True)
     bids_number = models.IntegerField(default=0)
     bid_price = models.ManyToManyField(Bids, related_name="Bid_price")
