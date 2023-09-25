@@ -119,7 +119,6 @@ def add_comment_or_bid(request, title):
                 listing.price = 0
             if new_bid > Decimal(listing.price):
                 listing.price = new_bid
-                listing.save()
                 new_bid_record = Bids.objects.create(bid_price=new_bid, user=user)
                 listing.bid_price.add(new_bid_record.id)
                 listing.bids_number += 1
