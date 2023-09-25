@@ -37,9 +37,6 @@
             {% if item.bids_number %}
                 <h6>{{ item.bids_number }} bid(s) so far.
                 {% for bid in item.bid_price.all %}
-                    {{ bid.user }}
-                    {{ bid.bid_price }}
-                    {{ bid }}
                     {% if bid.bid_price == item.price and user.username == bid.user %}
                         Your bid is the current bid.
                     {% endif %}
