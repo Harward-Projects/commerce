@@ -52,11 +52,12 @@
                 {% endif %}
             </form>
         {% else %}
-            {% if item.user == user.username %}
-                <p class="alert alert-success">You are the winner of this listing, with the price of {{ item.price }}</p>
-            {% else %}
-                <P class="alert alert-warning">This listing is Closed!</P>
-            {% endif %}
+            <P class="alert alert-warning">This listing is Closed!</P>
+            {% for bid in item.bid_price.all %}
+                {% if bid.bid_price == item.price and user.username == bid.user %}
+                    <p class="alert alert-success">You are the winner of this listing, with the price of {{ item.price }}</p>
+                {% endif %}
+            {% endfor %}
         {% endif %}
         <hr>
         {% if 'comment' in message %}
